@@ -1,27 +1,32 @@
-import  { useState, type ReactNode } from "react";
+import  { useState } from "react";
 import {BudgetInputs} from "@/components/BudgetInputs.tsx";
 import {HeroIntro} from "@/components/HeroIntro.tsx";
 import {SummaryCard, type TSummaryCardProps} from "@/components/SummaryCard";
 import {CategoryDropDown} from "@/components/CategoryDropDown";
+import {ExpenseInput} from "@/components/ExpenseInput"
 
 import {formatCurrency} from '@/utils/formatCurrency'
 
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
+import {expenseCategories} from "@/constants/expenseCategories";
+
 import { styled } from '@mui/material/styles';
-import {Container, Grid, Paper, Typography, Table, TableContainer, TableBody, TableCell, tableCellClasses, TableHead, TableRow} from "@mui/material";
+import {Container, Grid, Paper, Typography, Table, TableContainer, TableBody, TableCell, tableCellClasses, TableHead, TableRow, Button} from "@mui/material";
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+
+import { v4 as uuidv4 } from "uuid";
 
 import "./Home.scss";
 
 type TExpenses ={
-    id: number | null,
+    id: string | null,
     category: string | null,
-    icon: ReactNode | null,
     name: string | null,
     amount: number | null,
 }
@@ -35,7 +40,6 @@ type TBudgetData = {
 const defaultBudgetData: TBudgetData = {
     monthlyIncome: 0,
     savingsGoal: 0,
-    //expenses: [{id: null, category: null, icon: null, name: null, amount: null}],
     expenses: [],
 };
 
@@ -47,18 +51,16 @@ const StyledTableCell = styled(TableCell)(() => ({
 
 export const Home = () => {
     const [budgetData, setBudgetData] = useLocalStorage<TBudgetData>('budget-tracker', defaultBudgetData);
-    const [formExpenses, setFormExpenses] = useState<TExpenses>({id: null, category: null, icon: null, name: null, amount: null})
-
-    console.log('formExpenses',formExpenses);
+    const [formExpenses, setFormExpenses] = useState<TExpenses>({id: "", category: "", name: "", amount: 0})
 
     const monthlyIncome = budgetData.monthlyIncome ?? 0;
     const savingsGoal = budgetData.savingsGoal ?? 0;
-
     const monthlyExpenses = budgetData.expenses.reduce((total, expense) => {
-        return total + (expense.amount ?? 0);
+        return total + Number(expense.amount ?? 0);
     }, 0);
     const balance = monthlyIncome - monthlyExpenses;
     const afterSavingsGoal = balance - savingsGoal;
+    const monthlyExpensesPercentage = monthlyIncome > 0 ? (monthlyExpenses / monthlyIncome) * 100 : 0;
 
     const kpiData : TSummaryCardProps[] = [
         {
@@ -70,7 +72,7 @@ export const Home = () => {
         {
             title: "Monthly Expenses",
             value: formatCurrency(monthlyExpenses),
-            description: "65% of income",
+            description: `${monthlyExpensesPercentage.toFixed(0)}% of income`,
             icon: <TrendingDownIcon sx={{color:'var(--color-primary)'}}/>
         },
         {
@@ -107,7 +109,38 @@ export const Home = () => {
         }));
     };
 
-    //handleAddFormExpenses
+    const handleNameChange = (name: string) => {
+        setFormExpenses((currentData) => ({
+            ...currentData, name
+        }));
+    }
+
+    const handleAmountChange = (amount: number) => {
+        setFormExpenses((currentData) => ({
+            ...currentData, amount
+        }));
+    }
+
+    const handleAddFormExpenses = () => {
+        const newExpenses: TExpenses = {
+            id: uuidv4(),
+            category: formExpenses.category,
+            name: formExpenses.name,
+            amount: formExpenses.amount,
+        }
+
+        setBudgetData((currentData) => ({
+            ...currentData,
+            expenses: [...currentData.expenses, newExpenses]
+        }));
+
+        setFormExpenses({
+            id: "",
+            category: "",
+            name: "",
+            amount: null,
+        })
+    }
 
 
     return (
@@ -152,14 +185,19 @@ export const Home = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {budgetData.expenses.map((expense)=> (
-                                        <TableRow key={expense.id}>
-                                            <TableCell>{expense.category}</TableCell>
+                                    {budgetData.expenses.map((expense)=> {
+                                        const category = expenseCategories.find(
+                                            (category) => category.value === expense.category
+                                        );
+                                        const Icon = category?.Icon
+                                        return (
+                                            <TableRow key={expense.id}>
+                                            <TableCell> {Icon && <Icon fontSize="small" />} {category?.label ?? expense.category}</TableCell>
                                             <TableCell>{expense.name}</TableCell>
-                                            <TableCell>{expense.amount}</TableCell>
+                                            <TableCell>{formatCurrency(expense.amount)}</TableCell>
                                             <TableCell><DeleteOutlinedIcon/></TableCell>
-                                        </TableRow>
-                                    ))}
+                                        </TableRow>)
+                                    })}
                                 </TableBody>
                             </Table>
                         </TableContainer>
@@ -172,7 +210,20 @@ export const Home = () => {
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
                             A new item is immediately included in the overview.
                         </Typography>
-                        <CategoryDropDown categoryValue={formExpenses.category ?? ""} onCategoryChange={handleCategoryChange}/>
+                        <Grid sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+                            <CategoryDropDown categoryLabel='Category' categoryValue={formExpenses.category ?? ""} onCategoryChange={handleCategoryChange}/>
+                            <ExpenseInput expenseId='item-name' expenseLabel='Item name' expensePlaceholder='e.g. Food' expenseValue={formExpenses.name ?? ""} expenseType = 'text' onExpenseChange={handleNameChange}/>
+                            <ExpenseInput expenseId='item-amount' expenseLabel='Amount in €' expenseValue={formExpenses.amount ?? ""} expenseType = 'number' onExpenseChange={handleAmountChange}/>
+                            <Button
+                                variant='contained'
+                                startIcon={<AddOutlinedIcon sx={{color: 'var(--color-white)'}}/>}
+                                sx={{backgroundColor: 'var(--color-primary)', borderRadius: '16px'}}
+                                onClick={handleAddFormExpenses}
+                            >
+                                Add Item
+                            </Button>
+                        </Grid>
+
                     </Paper>
                 </Grid>
 
