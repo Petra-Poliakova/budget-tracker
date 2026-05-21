@@ -4,7 +4,8 @@ import {HeroIntro} from "@/components/HeroIntro.tsx";
 import {SummaryCard, type TSummaryCardProps} from "@/components/SummaryCard";
 import {CategoryDropDown} from "@/components/CategoryDropDown";
 import {ExpenseInput} from "@/components/ExpenseInput";
-import {ExpensesTable,  type TExpense} from "../components/ExpensesTable";
+import {ExpensesTable,  type TExpense} from "@/components/ExpensesTable";
+import {MonthlySummary} from "@/components/MonthlySummary"
 
 import {formatCurrency} from '@/utils/formatCurrency'
 import { useLocalStorage } from "@/hooks/useLocalStorage";
@@ -200,6 +201,7 @@ export const Home = () => {
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
                             The most important data for the current month.
                         </Typography>
+                        <MonthlySummary totalIncome={formatCurrency(budgetData.monthlyIncome)} totalExpenses={formatCurrency(monthlyExpenses)} monthlyBalance={formatCurrency(balance)} savingsGoal={formatCurrency(budgetData.savingsGoal)} />
                     </Paper>
                 </Grid>
             </Grid>
