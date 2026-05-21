@@ -12,7 +12,7 @@ import { useLocalStorage } from "@/hooks/useLocalStorage";
 import {expenseCategories} from "@/constants/expenseCategories";
 
 import { styled } from '@mui/material/styles';
-import {Container, Grid, Paper, Typography, Table, TableContainer, TableBody, TableCell, tableCellClasses, TableHead, TableRow, Button} from "@mui/material";
+import { Container, Grid, Paper, Typography, Table, TableContainer, TableBody, TableCell, tableCellClasses, TableHead, TableRow, Box, Button, IconButton } from "@mui/material";
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
@@ -142,6 +142,14 @@ export const Home = () => {
         })
     }
 
+    const handleDeleteExpense = (expenseId: string) => {
+        setBudgetData((prevBudgetData) => ({
+            ...prevBudgetData,
+            expenses: prevBudgetData.expenses.filter(
+                (expense) => expense.id !== expenseId
+            )
+        }))
+    }
 
     return (
         <Container maxWidth="xl">
@@ -174,8 +182,8 @@ export const Home = () => {
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
                             Manage and track all monthly household items.
                         </Typography>
-                        <TableContainer sx={{ border:'1px solid var(--color-text-secondary)', borderRadius: 3, overflowX: 'auto', width:'100%'}}>
-                            <Table sx={{ minWidth: 350 }} aria-label="expenses table">
+                        <TableContainer sx={{ border:'2px solid var(--color-table-border)', borderRadius: 3, overflowX: 'auto', width:'100%'}}>
+                            <Table sx={{ width: '100%' }} aria-label="expenses table">
                                 <TableHead >
                                     <TableRow>
                                         <StyledTableCell>Category</StyledTableCell>
@@ -191,11 +199,22 @@ export const Home = () => {
                                         );
                                         const Icon = category?.Icon
                                         return (
-                                            <TableRow key={expense.id}>
-                                            <TableCell> {Icon && <Icon fontSize="small" />} {category?.label ?? expense.category}</TableCell>
+                                            <TableRow key={expense.id} >
+                                            <TableCell >
+                                                <Box sx={{display:'flex', flexDirection:'row', gap: 2, alignItems: "center",}}>
+                                                    <Box sx={{width:35, height:35, backgroundColor:'var(--color-icon-bg)', borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,}}>
+                                                        {Icon && <Icon fontSize="small" sx={{color:'var(--color-primary)'}}/>}
+                                                    </Box>
+                                                    <Box>{category?.label ?? expense.category}</Box>
+                                                </Box>
+                                            </TableCell>
                                             <TableCell>{expense.name}</TableCell>
                                             <TableCell>{formatCurrency(expense.amount)}</TableCell>
-                                            <TableCell><DeleteOutlinedIcon/></TableCell>
+                                            <TableCell>
+                                                <IconButton onClick={() => handleDeleteExpense(expense.id)}>
+                                                    <DeleteOutlinedIcon fontSize='small' sx={{color:'text.secondary'}} titleAccess='Delete'/>
+                                                </IconButton>
+                                            </TableCell>
                                         </TableRow>)
                                     })}
                                 </TableBody>
