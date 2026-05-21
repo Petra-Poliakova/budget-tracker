@@ -3,38 +3,27 @@ import {BudgetInputs} from "@/components/BudgetInputs.tsx";
 import {HeroIntro} from "@/components/HeroIntro.tsx";
 import {SummaryCard, type TSummaryCardProps} from "@/components/SummaryCard";
 import {CategoryDropDown} from "@/components/CategoryDropDown";
-import {ExpenseInput} from "@/components/ExpenseInput"
+import {ExpenseInput} from "@/components/ExpenseInput";
+import {ExpensesTable,  type TExpense} from "../components/ExpensesTable";
 
 import {formatCurrency} from '@/utils/formatCurrency'
-
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
-import {expenseCategories} from "@/constants/expenseCategories";
-
-import { styled } from '@mui/material/styles';
-import { Container, Grid, Paper, Typography, Table, TableContainer, TableBody, TableCell, tableCellClasses, TableHead, TableRow, Box, Button, IconButton } from "@mui/material";
+import { Container, Grid, Paper, Typography, Button, } from "@mui/material";
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 
 import { v4 as uuidv4 } from "uuid";
 
 import "./Home.scss";
 
-type TExpenses ={
-    id: string | null,
-    category: string | null,
-    name: string | null,
-    amount: number | null,
-}
-
 type TBudgetData = {
     monthlyIncome: number | null;
     savingsGoal: number | null;
-    expenses: TExpenses [];
+    expenses: TExpense[];
 }
 
 const defaultBudgetData: TBudgetData = {
@@ -43,15 +32,9 @@ const defaultBudgetData: TBudgetData = {
     expenses: [],
 };
 
-const StyledTableCell = styled(TableCell)(() => ({
-    [`&.${tableCellClasses.head}`]: {
-        backgroundColor: 'var(--color-table-head-bg)',
-    },
-}));
-
 export const Home = () => {
     const [budgetData, setBudgetData] = useLocalStorage<TBudgetData>('budget-tracker', defaultBudgetData);
-    const [formExpenses, setFormExpenses] = useState<TExpenses>({id: "", category: "", name: "", amount: 0})
+    const [formExpenses, setFormExpenses] = useState<TExpense>({id: "", category: "", name: "", amount: 0})
 
     const monthlyIncome = budgetData.monthlyIncome ?? 0;
     const savingsGoal = budgetData.savingsGoal ?? 0;
@@ -122,7 +105,7 @@ export const Home = () => {
     }
 
     const handleAddFormExpenses = () => {
-        const newExpenses: TExpenses = {
+        const newExpenses: TExpense = {
             id: uuidv4(),
             category: formExpenses.category,
             name: formExpenses.name,
@@ -182,44 +165,10 @@ export const Home = () => {
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
                             Manage and track all monthly household items.
                         </Typography>
-                        <TableContainer sx={{ border:'2px solid var(--color-table-border)', borderRadius: 3, overflowX: 'auto', width:'100%'}}>
-                            <Table sx={{ width: '100%' }} aria-label="expenses table">
-                                <TableHead >
-                                    <TableRow>
-                                        <StyledTableCell>Category</StyledTableCell>
-                                        <StyledTableCell>Item</StyledTableCell>
-                                        <StyledTableCell>Amount</StyledTableCell>
-                                        <StyledTableCell>Action</StyledTableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {budgetData.expenses.map((expense)=> {
-                                        const category = expenseCategories.find(
-                                            (category) => category.value === expense.category
-                                        );
-                                        const Icon = category?.Icon
-                                        return (
-                                            <TableRow key={expense.id} >
-                                            <TableCell >
-                                                <Box sx={{display:'flex', flexDirection:'row', gap: 2, alignItems: "center",}}>
-                                                    <Box sx={{width:35, height:35, backgroundColor:'var(--color-icon-bg)', borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,}}>
-                                                        {Icon && <Icon fontSize="small" sx={{color:'var(--color-primary)'}}/>}
-                                                    </Box>
-                                                    <Box>{category?.label ?? expense.category}</Box>
-                                                </Box>
-                                            </TableCell>
-                                            <TableCell>{expense.name}</TableCell>
-                                            <TableCell>{formatCurrency(expense.amount)}</TableCell>
-                                            <TableCell>
-                                                <IconButton onClick={() => handleDeleteExpense(expense.id)}>
-                                                    <DeleteOutlinedIcon fontSize='small' sx={{color:'text.secondary'}} titleAccess='Delete'/>
-                                                </IconButton>
-                                            </TableCell>
-                                        </TableRow>)
-                                    })}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                        <ExpensesTable
+                            expenses={budgetData.expenses}
+                            onDeleteExpense={handleDeleteExpense}
+                        />
                     </Paper>
                 </Grid>
 
@@ -242,7 +191,6 @@ export const Home = () => {
                                 Add Item
                             </Button>
                         </Grid>
-
                     </Paper>
                 </Grid>
 
