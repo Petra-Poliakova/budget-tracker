@@ -16,7 +16,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuid4 } from "uuid";
 
 import "./Home.scss";
 
@@ -106,7 +106,7 @@ export const Home = () => {
 
     const handleAddFormExpenses = () => {
         const newExpenses: TExpense = {
-            id: uuidv4(),
+            id: uuid4(),
             category: formExpenses.category,
             name: formExpenses.name,
             amount: formExpenses.amount,
