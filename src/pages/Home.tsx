@@ -28,14 +28,15 @@ type TBudgetData = {
 }
 
 const defaultBudgetData: TBudgetData = {
-    monthlyIncome: 0,
-    savingsGoal: 0,
+    monthlyIncome: null,
+    savingsGoal: null,
     expenses: [],
 };
 
 export const Home = () => {
     const [budgetData, setBudgetData] = useLocalStorage<TBudgetData>('budget-tracker', defaultBudgetData);
-    const [formExpenses, setFormExpenses] = useState<TExpense>({id: "", category: "", name: "", amount: 0})
+    const [formExpenses, setFormExpenses] = useState<TExpense>({id: "", category: null, name: null, amount: null});
+    const [formErrors, setFormErrors] = useState<{category:boolean; amount: boolean}>({category: false, amount: false});
 
     const monthlyIncome = budgetData.monthlyIncome ?? 0;
     const savingsGoal = budgetData.savingsGoal ?? 0;
@@ -49,7 +50,7 @@ export const Home = () => {
     const kpiData : TSummaryCardProps[] = [
         {
             title: "Monthly Income",
-            value: formatCurrency(budgetData.monthlyIncome),
+            value: formatCurrency(budgetData.monthlyIncome ?? 0),
             description: "Total household income",
             icon: <BusinessCenterIcon sx={{color:'var(--color-primary)'}}/>
         },
@@ -73,14 +74,24 @@ export const Home = () => {
         },
     ]
 
-    const handleMonthlyIncome = (monthlyIncome: number)=> {
+    const validate = (): boolean => {
+    const errors = {
+        category: !formExpenses.category,
+        amount: !formExpenses.amount || formExpenses.amount <= 0,
+    };
+    
+    setFormErrors(errors);
+    return !errors.category && !errors.amount;
+};
+
+    const handleMonthlyIncome = (monthlyIncome: number | null)=> {
         setBudgetData((currentData) => ({
             ...currentData,
             monthlyIncome,
         }));
     }
 
-    const handleSavingsGoal = (savingsGoal: number) => {
+    const handleSavingsGoal = (savingsGoal: number | null) => {
         setBudgetData((currentData) => ({
             ...currentData,
             savingsGoal,
@@ -93,19 +104,21 @@ export const Home = () => {
         }));
     };
 
-    const handleNameChange = (name: string) => {
+    const handleNameChange = (name: string | number) => {
         setFormExpenses((currentData) => ({
-            ...currentData, name
+            ...currentData, name: typeof name === 'string' ? name : String(name)
         }));
     }
 
-    const handleAmountChange = (amount: number) => {
+    const handleAmountChange = (amount: string | number) => {
         setFormExpenses((currentData) => ({
-            ...currentData, amount
+            ...currentData, amount: typeof amount === 'string' ? Number(amount) : amount
         }));
     }
 
     const handleAddFormExpenses = () => {
+        if (!validate()) return;
+
         const newExpenses: TExpense = {
             id: uuid4(),
             category: formExpenses.category,
@@ -120,8 +133,8 @@ export const Home = () => {
 
         setFormExpenses({
             id: "",
-            category: "",
-            name: "",
+            category: null,
+            name: null,
             amount: null,
         })
     }
@@ -160,7 +173,7 @@ export const Home = () => {
             </Grid>
 
             <Grid container spacing={3} sx={{mt: 3, alignItems: 'stretch' }} >
-                <Grid size={{ xs: 12, md: 4 }} sx={{ display: 'flex', minWidth: 0 }}>
+                <Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ display: 'flex', minWidth: 0 }}>
                     <Paper sx={{padding:2.5, borderRadius: 3, boxShadow: "var(--shadow)", height: "100%", width: "100%", minWidth: 0, boxSizing: "border-box"}}>
                         <Typography variant="h6" sx={{color:'var(--color-text-main)', fontWeight: 600}}>List of expenses</Typography>
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
@@ -173,16 +186,16 @@ export const Home = () => {
                     </Paper>
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 4 }} sx={{ display: 'flex' }}>
+                <Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ display: 'flex' }}>
                     <Paper sx={{padding:2.5, borderRadius: 3, boxShadow: "var(--shadow)", height: "100%", width: "100%", minWidth: 0, boxSizing: "border-box"}}>
                         <Typography variant="h6" sx={{color:'var(--color-text-main)', fontWeight: 600}}>Add expense</Typography>
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
                             A new item is immediately included in the overview.
                         </Typography>
                         <Grid sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
-                            <CategoryDropDown categoryLabel='Category' categoryValue={formExpenses.category ?? ""} onCategoryChange={handleCategoryChange}/>
+                            <CategoryDropDown categoryLabel='Category' categoryValue={formExpenses.category ?? ""} error={formErrors.category} helperText={formErrors.category ? 'Category is required' : ''} onCategoryChange={handleCategoryChange}/>
                             <ExpenseInput expenseId='item-name' expenseLabel='Item name' expensePlaceholder='e.g. Food' expenseValue={formExpenses.name ?? ""} expenseType = 'text' onExpenseChange={handleNameChange}/>
-                            <ExpenseInput expenseId='item-amount' expenseLabel='Amount in €' expenseValue={formExpenses.amount ?? ""} expenseType = 'number' onExpenseChange={handleAmountChange}/>
+                            <ExpenseInput expenseId='item-amount' expenseLabel='Amount in €' expensePlaceholder='0' expenseValue={formExpenses.amount ?? ""} expenseType = 'number' error={formErrors.amount} helperText={formErrors.amount ? 'Amount must be greater than 0' : ''} onExpenseChange={handleAmountChange}/>
                             <Button
                                 variant='contained'
                                 startIcon={<AddOutlinedIcon sx={{color: 'var(--color-white)'}}/>}
@@ -195,13 +208,13 @@ export const Home = () => {
                     </Paper>
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 4 }} sx={{ display: 'flex' }}>
+                <Grid size={{ xs: 12, md: 12, lg: 4 }} sx={{ display: 'flex' }}>
                     <Paper sx={{padding:2.5, borderRadius: 3, boxShadow: "var(--shadow)", height: "100%", width: "100%", minWidth: 0, boxSizing: "border-box"}}>
                         <Typography variant="h6" sx={{color:'var(--color-text-main)', fontWeight: 600}}>Summary</Typography>
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
                             The most important data for the current month.
                         </Typography>
-                        <MonthlySummary totalIncome={formatCurrency(budgetData.monthlyIncome)} totalExpenses={formatCurrency(monthlyExpenses)} monthlyBalance={formatCurrency(balance)} savingsGoal={formatCurrency(budgetData.savingsGoal)} />
+                        <MonthlySummary totalIncome={formatCurrency(budgetData.monthlyIncome ?? 0)} totalExpenses={formatCurrency(monthlyExpenses)} monthlyBalance={formatCurrency(balance)} savingsGoal={formatCurrency(budgetData.savingsGoal ?? 0)} />
                     </Paper>
                 </Grid>
             </Grid>

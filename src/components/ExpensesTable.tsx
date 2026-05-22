@@ -6,9 +6,9 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 
 export type TExpense = {
     id: string;
-    category: string;
-    name: string;
-    amount: number;
+    category: string | null;
+    name: string | null;
+    amount: number | null;
 };
 
 type TExpenseTableProps = {
@@ -24,8 +24,8 @@ const StyledTableCell = styled(TableCell)(() => ({
 
 export const ExpensesTable = ({expenses, onDeleteExpense} : TExpenseTableProps) => {
     return (
-        <TableContainer sx={{ border:'2px solid var(--color-table-border)', borderRadius: 3, overflowX: 'auto', width:'100%'}}>
-            <Table sx={{ width: '100%' }} aria-label="expenses table">
+        <TableContainer sx={{ border:'2px solid var(--color-table-border)', borderRadius:3}}>
+            <Table sx={{width: '100%'}} aria-label="expenses table">
                 <TableHead >
                     <TableRow>
                         <StyledTableCell>Category</StyledTableCell>
@@ -43,15 +43,15 @@ export const ExpensesTable = ({expenses, onDeleteExpense} : TExpenseTableProps) 
                         return (
                             <TableRow key={expense.id} >
                                 <TableCell >
-                                    <Box sx={{display:'flex', flexDirection:'row', gap: 2, alignItems: "center",}}>
+                                    <Box sx={{display:'flex', flexDirection:'row', gap:2, alignItems: "center",}}>
                                         <Box sx={{width:35, height:35, backgroundColor:'var(--color-icon-bg)', borderRadius: 3, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,}}>
                                             {Icon && <Icon fontSize="small" sx={{color:'var(--color-primary)'}}/>}
                                         </Box>
                                         <Box>{category?.label ?? expense.category}</Box>
                                     </Box>
                                 </TableCell>
-                                <TableCell>{expense.name}</TableCell>
-                                <TableCell>{formatCurrency(expense.amount)}</TableCell>
+                                <TableCell>{expense.name ?? ''}</TableCell>
+                                <TableCell>{formatCurrency(expense.amount ?? 0)}</TableCell>
                                 <TableCell>
                                     <IconButton onClick={() => onDeleteExpense(expense.id)}>
                                         <DeleteOutlinedIcon fontSize='small' sx={{color:'text.secondary'}} titleAccess='Delete'/>

@@ -8,9 +8,11 @@ type TExpenseInputProps = {
     onExpenseChange: (value: string | number) => void;
     expenseType?: string;
     expensePlaceholder?:string;
+    error?: boolean;
+    helperText?: string;
 }
 
-export const ExpenseInput = ({expenseId, expenseLabel, expenseValue, onExpenseChange, expenseType, expensePlaceholder } : TExpenseInputProps) => {
+export const ExpenseInput = ({expenseId, expenseLabel, expenseValue, onExpenseChange, expenseType, expensePlaceholder, error, helperText } : TExpenseInputProps) => {
 
     const handleExpenseChange =(event: ChangeEvent<HTMLInputElement>) => {
         onExpenseChange(event.target.value)
@@ -21,7 +23,7 @@ export const ExpenseInput = ({expenseId, expenseLabel, expenseValue, onExpenseCh
             <Typography component="label" htmlFor={expenseId} sx={{fontSize: 14, fontWeight: 500, color: "text.primary",}} >
                 {expenseLabel}
             </Typography>
-            <TextField id={expenseId} fullWidth variant="outlined" type={expenseType} placeholder={expensePlaceholder} size="small" value={expenseValue ?? ""} onChange={handleExpenseChange} sx={{'& .MuiOutlinedInput-root': {borderRadius:'16px'}}}/>
+            <TextField id={expenseId} fullWidth variant="outlined" type={expenseType} placeholder={expensePlaceholder} size="small" value={expenseValue ?? ""} onChange={handleExpenseChange} error={error} helperText={helperText} sx={{'& .MuiOutlinedInput-root': {borderRadius:'16px'}}}/>
         </Stack>
     );
 };
