@@ -149,7 +149,7 @@ export const Home = () => {
     }
 
     return (
-        <Container maxWidth="xl">
+        <Container maxWidth="xl" sx={{mb:2}}>
             <Grid container spacing={3}>
                 <Grid size={{xs: 12, md: 6}}>
                     <HeroIntro/>
@@ -173,7 +173,7 @@ export const Home = () => {
             </Grid>
 
             <Grid container spacing={3} sx={{mt: 3, alignItems: 'stretch' }} >
-                <Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ display: 'flex', minWidth: 0 }}>
+                <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex', minWidth: 0 }}>
                     <Paper sx={{padding:2.5, borderRadius: 3, boxShadow: "var(--shadow)", height: "100%", width: "100%", minWidth: 0, boxSizing: "border-box"}}>
                         <Typography variant="h6" sx={{color:'var(--color-text-main)', fontWeight: 600}}>List of expenses</Typography>
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
@@ -186,7 +186,7 @@ export const Home = () => {
                     </Paper>
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 6, lg: 4 }} sx={{ display: 'flex' }}>
+                <Grid size={{ xs: 12, md: 6 }} sx={{ display: 'flex' }}>
                     <Paper sx={{padding:2.5, borderRadius: 3, boxShadow: "var(--shadow)", height: "100%", width: "100%", minWidth: 0, boxSizing: "border-box"}}>
                         <Typography variant="h6" sx={{color:'var(--color-text-main)', fontWeight: 600}}>Add expense</Typography>
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
@@ -207,8 +207,29 @@ export const Home = () => {
                         </Grid>
                     </Paper>
                 </Grid>
+            </Grid>
+            <Grid container spacing={3} sx={{mt: 3, alignItems: 'stretch' }} >
+                <Grid size={{ xs: 12, md: 4, }} sx={{ display: 'flex' }}>
+                    <Paper sx={{padding:2.5, borderRadius: 3, boxShadow: "var(--shadow)", height: "100%", width: "100%", minWidth: 0, boxSizing: "border-box"}}>
+                        <Typography variant="h6" sx={{color:'var(--color-text-main)', fontWeight: 600}}>Budget usage</Typography>
+                        <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
+                            A percentage view of how much of income is already covered by expenses.
+                        </Typography>
 
-                <Grid size={{ xs: 12, md: 12, lg: 4 }} sx={{ display: 'flex' }}>
+                    </Paper>
+                </Grid>
+
+                <Grid size={{ xs: 12, md: 4, }} sx={{ display: 'flex' }}>
+                    <Paper sx={{padding:2.5, borderRadius: 3, boxShadow: "var(--shadow)", height: "100%", width: "100%", minWidth: 0, boxSizing: "border-box"}}>
+                        <Typography variant="h6" sx={{color:'var(--color-text-main)', fontWeight: 600}}>Breakdown by category</Typography>
+                        <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
+                            A simple overview without an external chart library
+                        </Typography>
+
+                    </Paper>
+                </Grid>
+
+                <Grid size={{ xs: 12, md: 4, }} sx={{ display: 'flex' }}>
                     <Paper sx={{padding:2.5, borderRadius: 3, boxShadow: "var(--shadow)", height: "100%", width: "100%", minWidth: 0, boxSizing: "border-box"}}>
                         <Typography variant="h6" sx={{color:'var(--color-text-main)', fontWeight: 600}}>Summary</Typography>
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
@@ -217,6 +238,7 @@ export const Home = () => {
                         <MonthlySummary totalIncome={formatCurrency(budgetData.monthlyIncome ?? 0)} totalExpenses={formatCurrency(monthlyExpenses)} monthlyBalance={formatCurrency(balance)} savingsGoal={formatCurrency(budgetData.savingsGoal ?? 0)} />
                     </Paper>
                 </Grid>
+
             </Grid>
         </Container>
     );
