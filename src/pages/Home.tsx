@@ -5,7 +5,8 @@ import {SummaryCard, type TSummaryCardProps} from "@/components/SummaryCard";
 import {CategoryDropDown} from "@/components/CategoryDropDown";
 import {ExpenseInput} from "@/components/ExpenseInput";
 import {ExpensesTable,  type TExpense} from "@/components/ExpensesTable";
-import {MonthlySummary} from "@/components/MonthlySummary"
+import {MonthlySummary} from "@/components/MonthlySummary";
+import {BudgetLinearProgress} from "@/components/BudgetLinearProgress";
 
 import {formatCurrency} from '@/utils/formatCurrency'
 import { useLocalStorage } from "@/hooks/useLocalStorage";
@@ -215,7 +216,7 @@ export const Home = () => {
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
                             A percentage view of how much of income is already covered by expenses.
                         </Typography>
-
+                        <BudgetLinearProgress progressValue={61}/>
                     </Paper>
                 </Grid>
 
