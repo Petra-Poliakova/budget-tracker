@@ -10,6 +10,7 @@ import {BudgetLinearProgress} from "@/components/BudgetLinearProgress";
 
 import {formatCurrency} from '@/utils/formatCurrency'
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import {expenseCategories} from "@/constants/expenseCategories";
 
 import { Container, Grid, Paper, Typography, Button, Box} from "@mui/material";
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
@@ -57,6 +58,22 @@ export const Home = () => {
     const displayedBalancePercentage = Number(monthlyBalancePercentage.toFixed(1));
     const reserveProgressValue = clampProgressValue(displayedBalancePercentage);
 
+    const categoryProgressOverview = Object.values(
+        budgetData.expenses.reduce< Record<string, { category: string; amount: number }>>((acc, expense) => {
+            const category = expense.category ?? "Uncategorized";
+            const amount = Number(expense.amount ?? 0);
+
+            acc[category] ??= { category, amount: 0,  };
+            acc[category].amount += amount;
+
+            return acc;
+        }, {})
+    ).map((item) => ({
+        category: item.category,
+        amount: item.amount,
+        percentage: monthlyIncome > 0 ? Number(((item.amount / monthlyIncome) * 100).toFixed(1)) : 0,
+    })).sort((a, b) => b.percentage - a.percentage);
+
     const kpiData : TSummaryCardProps[] = [
         {
             title: "Monthly Income",
@@ -92,7 +109,7 @@ export const Home = () => {
     
     setFormErrors(errors);
     return !errors.category && !errors.amount;
-};
+    };
 
     const handleMonthlyIncome = (monthlyIncome: number | null)=> {
         setBudgetData((currentData) => ({
@@ -228,14 +245,14 @@ export const Home = () => {
                         <Grid sx={{mb:2}}>
                             <Box sx={{display:'flex', justifyContent:'space-between', alignItems:'center', mb:1}}>
                                 <Typography variant='body2' sx={{color:'var(--color-text-secondary)', fontWeight: 500,}}>Expenses</Typography>
-                                <Typography variant='body2' sx={{color:'var(--color-text-secondary)', fontWeight: 500,}}>{monthlyExpensesPercentage.toFixed(2)}%</Typography>
+                                <Typography variant='body2' sx={{color:'var(--color-text-secondary)', fontWeight: 500,}}>{displayedExpensesPercentage}%</Typography>
                             </Box>
                             <BudgetLinearProgress progressValue={expensesProgressValue}/>
                         </Grid>
                         <Grid sx={{mb:4}}>
                             <Box sx={{display:'flex', justifyContent:'space-between', alignItems:'center', mb:1}}>
                                 <Typography variant='body2' sx={{color:'var(--color-text-secondary)', fontWeight: 500,}}>Available reserve</Typography>
-                                <Typography variant='body2' sx={{color:'var(--color-text-secondary)', fontWeight: 500,}}>{monthlyBalancePercentage.toFixed(2)}%</Typography>
+                                <Typography variant='body2' sx={{color:'var(--color-text-secondary)', fontWeight: 500,}}>{displayedBalancePercentage}%</Typography>
                             </Box>
                             <BudgetLinearProgress progressValue={reserveProgressValue}/>
                         </Grid>
@@ -254,6 +271,27 @@ export const Home = () => {
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
                             A simple overview without an external chart library
                         </Typography>
+                        {categoryProgressOverview.map((item) => {
+                            const category = expenseCategories.find(
+                                (category) => category.value === item.category
+                            );
+
+                            const Icon = category?.Icon;
+                            return (
+                                <Grid key={item.category} sx={{ mb: 2 }}>
+                                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1, }} >
+                                        <Typography variant="body2" sx={{ color: "var(--color-text-secondary)", fontWeight: 500, display: "flex", alignItems: "center", gap: 1,}} >
+                                            {Icon && <Icon fontSize="small" />}
+                                            {category?.label ?? item.category}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: "var(--color-text-secondary)", fontWeight: 500 }} >
+                                            {item.percentage}%
+                                        </Typography>
+                                    </Box>
+                                    <BudgetLinearProgress progressValue={Math.min(Math.max(item.percentage, 0), 100)} />
+                                </Grid>
+                            );
+                        })}
                     </Paper>
                 </Grid>
 
