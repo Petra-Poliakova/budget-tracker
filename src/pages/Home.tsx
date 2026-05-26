@@ -11,7 +11,7 @@ import {BudgetLinearProgress} from "@/components/BudgetLinearProgress";
 import {formatCurrency} from '@/utils/formatCurrency'
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 
-import { Container, Grid, Paper, Typography, Button, } from "@mui/material";
+import { Container, Grid, Paper, Typography, Button, Box} from "@mui/material";
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
@@ -47,6 +47,15 @@ export const Home = () => {
     const balance = monthlyIncome - monthlyExpenses;
     const afterSavingsGoal = balance - savingsGoal;
     const monthlyExpensesPercentage = monthlyIncome > 0 ? (monthlyExpenses / monthlyIncome) * 100 : 0;
+    const monthlyBalancePercentage = monthlyExpenses > 0 ? (balance / monthlyExpenses) * 100 : 0;
+
+    const clampProgressValue = (value: number) => Math.min(Math.max(value, 0), 100);
+
+    const displayedExpensesPercentage = Number(monthlyExpensesPercentage.toFixed(2));
+    const expensesProgressValue = clampProgressValue(displayedExpensesPercentage);
+
+    const displayedBalancePercentage = Number(monthlyBalancePercentage.toFixed(2));
+    const reserveProgressValue = clampProgressValue(displayedBalancePercentage);
 
     const kpiData : TSummaryCardProps[] = [
         {
@@ -216,7 +225,26 @@ export const Home = () => {
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
                             A percentage view of how much of income is already covered by expenses.
                         </Typography>
-                        <BudgetLinearProgress progressValue={61}/>
+                        <Grid sx={{mb:2}}>
+                            <Box sx={{display:'flex', justifyContent:'space-between', alignItems:'center', mb:1}}>
+                                <Typography variant='body2' sx={{color:'var(--color-text-secondary)', fontWeight: 500,}}>Expenses</Typography>
+                                <Typography variant='body2' sx={{color:'var(--color-text-secondary)', fontWeight: 500,}}>{monthlyExpensesPercentage.toFixed(2)}%</Typography>
+                            </Box>
+                            <BudgetLinearProgress progressValue={expensesProgressValue}/>
+                        </Grid>
+                        <Grid sx={{mb:4}}>
+                            <Box sx={{display:'flex', justifyContent:'space-between', alignItems:'center', mb:1}}>
+                                <Typography variant='body2' sx={{color:'var(--color-text-secondary)', fontWeight: 500,}}>Available reserve</Typography>
+                                <Typography variant='body2' sx={{color:'var(--color-text-secondary)', fontWeight: 500,}}>{monthlyBalancePercentage.toFixed(2)}%</Typography>
+                            </Box>
+                            <BudgetLinearProgress progressValue={reserveProgressValue}/>
+                        </Grid>
+                        <Box sx={{backgroundColor:'var(--color-bg-soft)', px: 2, py:1, borderRadius: 3, }}>
+                            The budget is currently {balance > 0 ? <strong>in surplus</strong> : <strong>in deficit</strong>}.
+                            {balance >= 0
+                                ? <> After covering all expenses, {formatCurrency(balance)} remains.</>
+                                : <> Expenses exceed income by {formatCurrency(Math.abs(balance))}.</>}
+                        </Box>
                     </Paper>
                 </Grid>
 
@@ -226,7 +254,6 @@ export const Home = () => {
                         <Typography variant="body2" sx={{color: 'var(--color-text-secondary)', mb:2}}>
                             A simple overview without an external chart library
                         </Typography>
-
                     </Paper>
                 </Grid>
 
