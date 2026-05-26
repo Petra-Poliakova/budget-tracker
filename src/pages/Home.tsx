@@ -47,14 +47,14 @@ export const Home = () => {
     const balance = monthlyIncome - monthlyExpenses;
     const afterSavingsGoal = balance - savingsGoal;
     const monthlyExpensesPercentage = monthlyIncome > 0 ? (monthlyExpenses / monthlyIncome) * 100 : 0;
-    const monthlyBalancePercentage = monthlyExpenses > 0 ? (balance / monthlyExpenses) * 100 : 0;
+    const monthlyBalancePercentage = monthlyIncome > 0 ? (balance / monthlyIncome) * 100 : 0;
 
     const clampProgressValue = (value: number) => Math.min(Math.max(value, 0), 100);
 
-    const displayedExpensesPercentage = Number(monthlyExpensesPercentage.toFixed(2));
+    const displayedExpensesPercentage = Number(monthlyExpensesPercentage.toFixed(1));
     const expensesProgressValue = clampProgressValue(displayedExpensesPercentage);
 
-    const displayedBalancePercentage = Number(monthlyBalancePercentage.toFixed(2));
+    const displayedBalancePercentage = Number(monthlyBalancePercentage.toFixed(1));
     const reserveProgressValue = clampProgressValue(displayedBalancePercentage);
 
     const kpiData : TSummaryCardProps[] = [
