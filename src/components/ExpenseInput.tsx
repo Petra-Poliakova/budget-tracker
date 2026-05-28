@@ -4,8 +4,8 @@ import {Stack, TextField, Typography} from "@mui/material";
 type TExpenseInputProps = {
     expenseId: string,
     expenseLabel: string;
-    expenseValue: string | number;
-    onExpenseChange: (value: string | number) => void;
+    expenseValue: string;
+    onExpenseChange: (value: string) => void;
     expenseType?: string;
     expensePlaceholder?:string;
     error?: boolean;

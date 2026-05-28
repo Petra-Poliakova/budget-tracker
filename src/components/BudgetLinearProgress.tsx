@@ -29,7 +29,6 @@ export const BudgetLinearProgress = ({progressValue}:LinearProgressProps) => {
         <BorderLinearProgress
             variant="determinate"
             value={progressValue}
-            aria-label="Export data"
         />
     );
 };

@@ -9,12 +9,11 @@ type BudgetInputsProps = {
 };
 
 const parseNumberInput = (value: string) => {
-    if (value === "") {
-        return null;
-    }
+    if (value === "") return null;
 
     const parsedValue = Number(value);
-    return Number.isFinite(parsedValue) ? parsedValue : null;
+    if (!Number.isFinite(parsedValue) || parsedValue < 0) return null;
+    return parsedValue;
 };
 
 export const BudgetInputs = ({income, savingsGoal, onIncomeChange, onSavingsGoalChange,}: BudgetInputsProps) => {
@@ -34,7 +33,15 @@ export const BudgetInputs = ({income, savingsGoal, onIncomeChange, onSavingsGoal
                         <Typography component="label" htmlFor="monthly-income" sx={{fontSize: 14, fontWeight: 500, color: "text.primary",}} >
                             Monthly income
                         </Typography>
-                        <TextField id="monthly-income" fullWidth variant="outlined" type='number' size="small" placeholder="0" value={income ?? ""} onChange={handleIncomeChange}/>
+                        <TextField 
+                            id="monthly-income" 
+                            fullWidth variant="outlined" 
+                            type='number'
+                            slotProps={{ htmlInput: { min: 0 } }}
+                            size="small" 
+                            placeholder="0" 
+                            value={income ?? ""} 
+                            onChange={handleIncomeChange}/>
                     </Stack>
                 </Grid>
                 <Grid size={{xs: 12, sm: 6}}>
@@ -42,7 +49,16 @@ export const BudgetInputs = ({income, savingsGoal, onIncomeChange, onSavingsGoal
                         <Typography component="label" htmlFor="savings-goal" sx={{fontSize: 14, fontWeight: 500, color: "text.primary",}} >
                             Savings goal
                         </Typography>
-                        <TextField id="savings-goal" fullWidth variant="outlined" type='number' size="small" placeholder="0" value={savingsGoal ?? ""} onChange={handleSavingsGoalChange}/>
+                        <TextField 
+                            id="savings-goal" 
+                            fullWidth 
+                            variant="outlined" 
+                            type='number' 
+                            slotProps={{ htmlInput: { min: 0 } }}
+                            size="small" 
+                            placeholder="0" 
+                            value={savingsGoal ?? ""} 
+                            onChange={handleSavingsGoalChange}/>
                     </Stack>
                 </Grid>
             </Grid>

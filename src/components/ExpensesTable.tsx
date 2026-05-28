@@ -1,4 +1,7 @@
-import { Table, TableContainer, TableBody, TableCell, tableCellClasses, TableHead, TableRow, Box, IconButton } from "@mui/material";
+import { useState } from "react";
+import { Table, TableContainer, TableBody, TableCell, tableCellClasses, TableHead, TableRow, Box, IconButton,
+    Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button
+ } from "@mui/material";
 import {styled} from "@mui/material/styles";
 import {expenseCategories} from "@/constants/expenseCategories";
 import {formatCurrency} from '@/utils/formatCurrency'
@@ -23,7 +26,23 @@ const StyledTableCell = styled(TableCell)(() => ({
 }));
 
 export const ExpensesTable = ({expenses, onDeleteExpense} : TExpenseTableProps) => {
+    const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
+    const handleDeleteClick = (id: string) => {
+        setPendingDeleteId(id);  
+    };
+
+    const handleConfirm = () => {
+        if (pendingDeleteId) onDeleteExpense(pendingDeleteId);
+        setPendingDeleteId(null); 
+    };
+
+    const handleCancel = () => {
+        setPendingDeleteId(null); 
+    };
+
     return (
+        <>
         <TableContainer sx={{ border:'2px solid var(--color-table-border)', borderRadius:3}}>
             <Table sx={{width: '100%'}} aria-label="expenses table">
                 <TableHead >
@@ -53,7 +72,7 @@ export const ExpensesTable = ({expenses, onDeleteExpense} : TExpenseTableProps) 
                                 <TableCell>{expense.name ?? ''}</TableCell>
                                 <TableCell>{formatCurrency(expense.amount ?? 0)}</TableCell>
                                 <TableCell>
-                                    <IconButton onClick={() => onDeleteExpense(expense.id)}>
+                                    <IconButton onClick={() => handleDeleteClick(expense.id)}>
                                         <DeleteOutlinedIcon fontSize='small' sx={{color:'text.secondary'}} titleAccess='Delete'/>
                                     </IconButton>
                                 </TableCell>
@@ -62,6 +81,22 @@ export const ExpensesTable = ({expenses, onDeleteExpense} : TExpenseTableProps) 
                 </TableBody>
             </Table>
         </TableContainer>
+
+        <Dialog open={pendingDeleteId !== null} onClose={handleCancel}>
+                <DialogTitle>Delete expense</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete this expense? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancel}>Cancel</Button>
+                    <Button onClick={handleConfirm} color="error" variant="contained">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
     );
 };
 

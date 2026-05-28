@@ -1,10 +1,11 @@
 import {Stack, Box, Typography} from "@mui/material";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 type MonthlySummaryProps = {
-    totalIncome: string;
-    totalExpenses: string;
-    monthlyBalance: string;
-    savingsGoal: string;
+    totalIncome: number;
+    totalExpenses: number;
+    monthlyBalance: number;
+    savingsGoal: number;
 }
 
 export const MonthlySummary = ({totalIncome, totalExpenses, monthlyBalance, savingsGoal} : MonthlySummaryProps) => {
@@ -36,19 +37,19 @@ export const MonthlySummary = ({totalIncome, totalExpenses, monthlyBalance, savi
         <Stack sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
             <Box sx={summaryItemSx}>
                 <Typography variant="body2" sx={summaryLabelSx}>Total income</Typography>
-                <Typography sx={summaryValueSx}>{totalIncome}</Typography>
+                <Typography sx={summaryValueSx}>{formatCurrency(totalIncome)}</Typography>
             </Box>
             <Box sx={summaryItemSx}>
                 <Typography variant="body2" sx={summaryLabelSx}>Total expenses</Typography>
-                <Typography sx={summaryValueSx}>{totalExpenses}</Typography>
+                <Typography sx={summaryValueSx}>{formatCurrency(totalExpenses)}</Typography>
             </Box>
             <Box sx={summaryItemSx}>
                 <Typography variant="body2" sx={summaryLabelSx}>Monthly balance</Typography>
-                <Typography sx={summaryValueSx}>{monthlyBalance}</Typography>
+                <Typography sx={summaryValueSx}>{formatCurrency(monthlyBalance)}</Typography>
             </Box>
             <Box sx={summaryItemSx}>
                 <Typography variant="body2" sx={summaryLabelSx}>Savings goal</Typography>
-                <Typography sx={summaryValueSx}>{savingsGoal}</Typography>
+                <Typography sx={summaryValueSx}>{formatCurrency(savingsGoal)}</Typography>
             </Box>
 
         </Stack>

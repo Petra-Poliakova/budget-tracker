@@ -29,7 +29,6 @@ export const CategoryDropDown = ({ categoryLabel, categoryValue, onCategoryChang
                     value={categoryValue} onChange={handleCategoryChange}
                     sx={{height: 42, borderRadius: "16px",}}
                     displayEmpty
-                    //renderValue={(selected) => { if (selected.length === 0) { return <em>Select category</em>; } return expenseCategories.find((category) => category.value === selected)?.label; }}
                     renderValue={ () => {
                         if(!selectedCategory) {
                             return <em>Select category</em>;
@@ -42,7 +41,6 @@ export const CategoryDropDown = ({ categoryLabel, categoryValue, onCategoryChang
                             </Box>
                         );
                     } }
-                    inputProps={{ 'aria-label': 'Without label' }}
                 >
                     <MenuItem value="" disabled><em>Select category</em></MenuItem>
                     {expenseCategories.map(category => {
