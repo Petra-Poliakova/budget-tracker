@@ -1,7 +1,7 @@
-import  { useState, useMemo, useCallback } from "react";
+import  { useState, useCallback } from "react";
 import {BudgetInputs} from "@/components/BudgetInputs.tsx";
 import {HeroIntro} from "@/components/HeroIntro.tsx";
-import {SummaryCard, type TSummaryCardProps} from "@/components/SummaryCard";
+import {SummaryCard, } from "@/components/SummaryCard";
 import {CategoryDropDown} from "@/components/CategoryDropDown";
 import {ExpenseInput} from "@/components/ExpenseInput";
 import {ExpensesTable,  type TExpense} from "@/components/ExpensesTable";
@@ -10,99 +10,31 @@ import {BudgetLinearProgress} from "@/components/BudgetLinearProgress";
 import {DashboardCard} from "@/components/DashboardCard";
 
 import {formatCurrency} from '@/utils/formatCurrency'
-import { useLocalStorage } from "@/hooks/useLocalStorage";
+import {useBudgetOverview} from "@/hooks/useBudgetOverview.tsx";
 import {expenseCategories} from "@/constants/expenseCategories";
 
 import { Container, Grid, Typography, Button, Box } from "@mui/material";
-import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 
 import { v4 as uuid4 } from "uuid";
 
-type TBudgetData = {
-    monthlyIncome: number | null;
-    savingsGoal: number | null;
-    expenses: TExpense[];
-}
-
-const defaultBudgetData: TBudgetData = {
-    monthlyIncome: null,
-    savingsGoal: null,
-    expenses: [],
-};
-
 export const Home = () => {
-    const [budgetData, setBudgetData] = useLocalStorage<TBudgetData>('budget-tracker', defaultBudgetData);
+    //const [budgetData, setBudgetData] = useLocalStorage<TBudgetData>('budget-tracker', defaultBudgetData);
     const [formExpenses, setFormExpenses] = useState<TExpense>({id: "", category: null, name: null, amount: null});
     const [formErrors, setFormErrors] = useState<{category:boolean; amount: boolean}>({category: false, amount: false});
-
-    const monthlyIncome = budgetData.monthlyIncome ?? 0;
-    const savingsGoal = budgetData.savingsGoal ?? 0;
-
-    const monthlyExpenses = useMemo(() => {
-        return budgetData.expenses.reduce((total, expense) => total + Number(expense.amount ?? 0), 0);
-    },[budgetData.expenses])
-
-    const balance = monthlyIncome - monthlyExpenses;
-    const afterSavingsGoal = balance - savingsGoal;
-    const monthlyExpensesPercentage = monthlyIncome > 0 ? (monthlyExpenses / monthlyIncome) * 100 : 0;
-    const monthlyBalancePercentage = monthlyIncome > 0 ? (balance / monthlyIncome) * 100 : 0;
-
-    const clampProgressValue = (value: number) => Math.min(Math.max(value, 0), 100);
-
-    const displayedExpensesPercentage = Number(monthlyExpensesPercentage.toFixed(1));
-    const expensesProgressValue = clampProgressValue(displayedExpensesPercentage);
-
-    const displayedBalancePercentage = Number(monthlyBalancePercentage.toFixed(1));
-    const reserveProgressValue = clampProgressValue(displayedBalancePercentage);
-
-    const categoryProgressOverview = useMemo(() => {
-        return Object.values(
-        budgetData.expenses.reduce< Record<string, { category: string; amount: number }>>((acc, expense) => {
-            const category = expense.category ?? "Uncategorized";
-            const amount = Number(expense.amount ?? 0);
-
-            acc[category] ??= { category, amount: 0,  };
-            acc[category].amount += amount;
-
-            return acc;
-        }, {})
-    ).map((item) => ({
-        category: item.category,
-        amount: item.amount,
-        percentage: monthlyIncome > 0 ? Number(((item.amount / monthlyIncome) * 100).toFixed(1)) : 0,
-    })).sort((a, b) => b.percentage - a.percentage);
-    },[budgetData.expenses, monthlyIncome])
-
-    const kpiData : TSummaryCardProps[] = [
-        {
-            title: "Monthly Income",
-            value: formatCurrency(budgetData.monthlyIncome ?? 0),
-            description: "Total household income",
-            icon: <BusinessCenterIcon sx={{color:'var(--color-primary)'}}/>
-        },
-        {
-            title: "Monthly Expenses",
-            value: formatCurrency(monthlyExpenses),
-            description: `${monthlyExpensesPercentage.toFixed(0)}% of income`,
-            icon: <TrendingDownIcon sx={{color:'var(--color-primary)'}}/>
-        },
-        {
-            title: "Balance",
-            value: formatCurrency(balance),
-            description: "Amount left after expenses",
-            icon: <TrendingUpIcon sx={{color:'var(--color-primary)'}}/>
-        },
-        {
-            title: "After Savings Goal",
-            value: formatCurrency(afterSavingsGoal),
-            description: "Balance after setting savings aside",
-            icon: <SavingsOutlinedIcon sx={{color:'var(--color-primary)'}}/>
-        },
-    ]
+    const {
+        budgetData,
+        setBudgetData,
+        monthlyExpenses,
+        balance,
+        displayedExpensesPercentage,
+        displayedBalancePercentage,
+        expensesProgressValue,
+        reserveProgressValue,
+        categoryProgressOverview,
+        kpiData,
+        clampProgressValue,
+    } = useBudgetOverview();
 
     const validate = (): boolean => {
     const errors = {
