@@ -1,73 +1,60 @@
-# React + TypeScript + Vite
+# Budget Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive personal budget dashboard for tracking monthly income, savings goals, and expenses. The application calculates the current balance, shows how much of the income has been spent, and presents expense data by category.
 
-Currently, two official plugins are available:
+[Open the live application](https://petra-poliakova.github.io/budget-tracker/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Set a monthly income and savings goal
+- Add expenses with a category, name, and amount
+- Remove expenses with a confirmation step
+- View monthly income, expenses, balance, and remaining money after savings
+- Monitor budget and reserve usage with progress indicators
+- Compare spending across categories
+- Explore visual reports with pie, gauge, and bar charts
+- Keep entered data between visits using browser local storage
+- Use the application comfortably on desktop and mobile screens
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Technologies
 
-## Expanding the ESLint configuration
+- React 19
+- TypeScript
+- Vite
+- Material UI and MUI X Charts
+- React Router
+- Vitest and Testing Library
+- GitHub Actions and GitHub Pages
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Requirements
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Node.js (a current LTS version is recommended)
+- npm
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Installation
+
+```bash
+git clone https://github.com/Petra-Poliakova/budget-tracker.git
+cd budget-tracker
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Vite will print the local development address in the terminal, usually `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Available Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev       # Start the development server
+npm run build     # Type-check and create a production build
+npm run preview   # Preview the production build locally
+npm run lint      # Run ESLint
+npm run test      # Run tests in watch mode
+npm run coverage  # Run tests and generate a coverage report
 ```
+
+## Data Storage
+
+Budget data is stored in the browser's `localStorage`. The application does not require an account or a backend, and the data is not synchronized between browsers or devices. Clearing browser storage also removes the saved budget.
