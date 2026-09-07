@@ -6,11 +6,13 @@ describe('HeroIntro', () => {
     render(<HeroIntro />);
 
     expect(screen.getByText('Household budget calculator')).toBeInTheDocument();
-    expect(screen.getByText('Monthly household finance overview')).toBeInTheDocument();
+    //expect(screen.getByText('Monthly household finance overview')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Monthly household finance overview', level: 5 })).toBeInTheDocument();
     expect(
       screen.getByText('Enter your income, savings goal, and monthly expenses.')
     ).toBeInTheDocument();
-    //screen.debug();
+    screen.debug();
   });
   
+
 });
